@@ -2,10 +2,10 @@
 <html lang="en">
   <head>
     <title>Add blog</title>
-    <%- include("./partials/Head") %>
+    <%- include("./partials/head") %>
   </head>
   <body>
-    <%- include('./partials/nav') %> <%= JSON.stringify(user) %>
+    <%- include('./partials/nav') %>
     <div class="container mt-3">
       <form action="/blog" method="post" enctype="multipart/form-data">
         <div class="mb-3">

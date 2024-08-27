@@ -25,6 +25,15 @@ router.get("/add-new", (req, res) => {
     });
 });
 
+//for dynamic route which is based on ._id of user 
+router.get('/:id', async (req, res) => {
+    const blog = await blogModel.findById(req.params.id);
+    res.render("blog", {
+        user: req.user,
+        blog,
+    })
+
+});
 
 router.post("/", upload.single("coverImage"), async (req, res) => {
     const { title, body } = req.body;
