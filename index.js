@@ -16,10 +16,12 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 //middlwares
+app.use(express.json());             //parses incoming requests with JSON payloads and makes the parsed data available on req.body
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(checkForAuthenticationCookie("token"));      // we have passed token here because we set the token name as token while creating
 app.use(express.static(path.resolve("./public")));   //we are telling express that serve public folder statically 
+
 
 app.get('/', async (req, res) => {
     const allBlogs = await blogModel.find({});
