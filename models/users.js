@@ -1,6 +1,8 @@
-const { Schema, model } = require("mongoose");
+const { Schema, model, Collection } = require("mongoose");
 const { createHmac, randomBytes } = require("crypto");
 const { creatJsonWebToken } = require("../services/authentication");
+
+
 
 
 //creating schema

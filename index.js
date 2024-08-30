@@ -6,6 +6,9 @@ const blogRoute = require("./routes/blog");
 const blogModel = require("./models/blog");
 const cookieParser = require("cookie-parser");
 const { checkForAuthenticationCookie } = require("./middlwares/authentication");
+const saveCountriesToDB = require('./services/countryData');
+const saveStatesToDB = require("./services/stateData");
+const saveCitiesToDB = require("./services/cityData");
 
 const app = express();
 const PORT = 8000;
@@ -22,6 +25,20 @@ app.use(cookieParser());
 app.use(checkForAuthenticationCookie("token"));      // we have passed token here because we set the token name as token while creating
 app.use(express.static(path.resolve("./public")));   //we are telling express that serve public folder statically 
 
+
+// Function to save data to the database
+const saveDataToDB = async () => {
+    try {
+        await saveCountriesToDB();
+        await saveStatesToDB();
+        await saveCitiesToDB();
+    } catch (error) {
+        console.error('Error saving data to the database:', error);
+    }
+};
+
+// Call the function to save data when the server starts
+saveDataToDB();
 
 app.get('/', async (req, res) => {
     const allBlogs = await blogModel.find({});

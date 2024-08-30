@@ -1,0 +1,28 @@
+//Country data demo from npm i country-state-city package 
+
+{
+    name: 'Durrës County',
+    isoCode: '02',
+    countryCode: 'AL',
+    latitude: '41.50809720',
+    longitude: '19.61631850'
+  },
+
+  ........................................State..................................................
+
+  {
+    name: 'Laghman',
+    isoCode: 'LAG',
+    countryCode: 'AF',
+    latitude: '34.68976870',
+    longitude: '70.14558050'
+  },
+  ........................................City...................................................
+
+  {
+    name: 'Kandahār',
+    countryCode: 'AF',
+    stateCode: 'KAN',
+    latitude: '31.61332000',
+    longitude: '65.71013000'
+  },
