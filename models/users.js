@@ -1,4 +1,4 @@
-const { Schema, model, Collection } = require("mongoose");
+const { Schema, model } = require("mongoose");
 const { createHmac, randomBytes } = require("crypto");
 const { creatJsonWebToken } = require("../services/authentication");
 
@@ -24,6 +24,7 @@ const userSchema = new Schema({
     password: {
         type: String,
         required: true,
+        minlength: 6,
     },
     profileImageUrl: {
         type: String,
@@ -33,7 +34,19 @@ const userSchema = new Schema({
         type: String,
         enum: ["USER", "ADMIN"],
         default: "USER",
-    }
+    },
+    country: {
+        type: String,
+        required: true,
+    },
+    state: {
+        type: String,
+        required: true,
+    },
+    city: {
+        type: String,
+        required: true,
+    },
 }, { timestamps: true });
 
 //pre-save

@@ -40,6 +40,41 @@
             name="password"
           />
         </div>
+        <div class="mb-3">
+          <h2>Select Location</h2>
+
+          <!-- Country Dropdown -->
+          <label for="country">Country:</label>
+          <select id="country" name="country" onchange="this.form.submit()">
+              <option value="">Select Country</option>
+              <% countries.forEach(country => { %>
+                  <option value="<%= country._id %>" <%= selectedCountry === country._id ? 'selected' : '' %>><%= country.name %></option>
+              <% }) %>
+          </select>
+
+          <!-- State Dropdown -->
+          <% if (selectedCountry) { %>
+              <label for="state">State:</label>
+              <select id="state" name="state" onchange="this.form.submit()">
+                  <option value="">Select State</option>
+                  <% states.forEach(state => { %>
+                      <option value="<%= state._id %>" <%= selectedState === state._id ? 'selected' : '' %>><%= state.name %></option>
+                  <% }) %>
+              </select>
+          <% } %>
+
+          <!-- City Dropdown -->
+          <% if (selectedState) { %>
+              <label for="city">City:</label>
+              <select id="city" name="city">
+                  <option value="">Select City</option>
+                  <% cities.forEach(city => { %>
+                      <option value="<%= city._id %>"><%= city.name %></option>
+                  <% }) %>
+              </select>
+          <% } %>
+
+      </div>
         <button type="submit" class="btn btn-primary">Submit</button>
       </form>
     </div>

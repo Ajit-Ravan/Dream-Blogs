@@ -1,5 +1,5 @@
 const { City } = require('country-state-city');
-const CityModel = require('../models/City');
+const CityModel = require('../models/city');
 
 const saveCitiesToDB = async () => {
     // Check if cities already exist
