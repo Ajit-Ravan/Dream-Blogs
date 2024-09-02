@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>signup page</title>
+    <title>Signup Page</title>
     <%- include("./partials/head") %>
   </head>
   <body>
@@ -14,23 +14,22 @@
             type="text"
             class="form-control"
             id="firstName"
-            aria-describedby="firstName"
             name="firstName"
+            required
           />
         </div>
+
         <div class="mb-3">
           <label for="email" class="form-label">Email address</label>
           <input
             type="email"
             class="form-control"
             id="email"
-            aria-describedby="email"
             name="email"
+            required
           />
-          <div id="emailHelp" class="form-text">
-            We'll never share your email with anyone else.
-          </div>
         </div>
+
         <div class="mb-3">
           <label for="password" class="form-label">Password</label>
           <input
@@ -38,46 +37,126 @@
             class="form-control"
             id="password"
             name="password"
+            required
           />
         </div>
+
         <div class="mb-3">
           <h2>Select Location</h2>
 
           <!-- Country Dropdown -->
           <label for="country">Country:</label>
-          <select id="country" name="country" onchange="this.form.submit()">
-              <option value="">Select Country</option>
-              <% countries.forEach(country => { %>
-                  <option value="<%= country._id %>" <%= selectedCountry === country._id ? 'selected' : '' %>><%= country.name %></option>
-              <% }) %>
+          <select id="country" name="country" onchange="loadStates()">
+            <option value="">Select Country</option>
+            <% countries.forEach(country => { %>
+            <option value="<%= country.short_name %>">
+              <%= country.name %>
+            </option>
+            <!-- Assuming country.short_name is the countryCode -->
+            <% }) %>
           </select>
 
           <!-- State Dropdown -->
-          <% if (selectedCountry) { %>
-              <label for="state">State:</label>
-              <select id="state" name="state" onchange="this.form.submit()">
-                  <option value="">Select State</option>
-                  <% states.forEach(state => { %>
-                      <option value="<%= state._id %>" <%= selectedState === state._id ? 'selected' : '' %>><%= state.name %></option>
-                  <% }) %>
-              </select>
-          <% } %>
+          <label for="state" class="mt-2">State:</label>
+          <select id="state" name="state" onchange="loadCities()">
+            <option value="">Select State</option>
+            <% states.forEach(state => { %>
+            <option value="<%= state._id %>"><%= state.name %></option>
+            <% }) %>
+          </select>
 
           <!-- City Dropdown -->
-          <% if (selectedState) { %>
-              <label for="city">City:</label>
-              <select id="city" name="city">
-                  <option value="">Select City</option>
-                  <% cities.forEach(city => { %>
-                      <option value="<%= city._id %>"><%= city.name %></option>
-                  <% }) %>
-              </select>
-          <% } %>
+          <label for="city" class="mt-2">City:</label>
+          <select id="city" name="city" class="form-select" required disabled>
+            <option value="">Select City</option>
+          </select>
+        </div>
 
-      </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="submit" class="btn btn-primary mt-3">Submit</button>
       </form>
     </div>
+
     <%- include('./partials/scripts') %>
+
+    <script>
+      // DOM Elements
+      const countrySelect = document.getElementById("country");
+      const stateSelect = document.getElementById("state");
+      const citySelect = document.getElementById("city");
+
+      // Fetch and populate countries
+      fetch("/get-countries")
+        .then((response) => response.json())
+        .then((data) => {
+          data.data.forEach((country) => {
+            const option = document.createElement("option");
+            option.value = country.short_name; // Assuming country.short_name is the countryCode
+            option.textContent = country.name;
+            countrySelect.appendChild(option);
+          });
+        })
+        .catch((err) => console.error("Error fetching countries:", err));
+
+      // Event listener for country change
+      countrySelect.addEventListener("change", function () {
+        loadStates(); // Call the loadStates function on country change
+      });
+
+      // Function to load states based on selected country
+      function loadStates() {
+        const countryCode = countrySelect.value; // Assuming the value is the countryCode
+        stateSelect.innerHTML = '<option value="">Select State</option>';
+        citySelect.innerHTML = '<option value="">Select City</option>';
+        stateSelect.disabled = true;
+        citySelect.disabled = true;
+
+        console.log("Fetching states for country code:", countryCode);
+        if (countryCode) {
+        }
+        fetch(`/get-states?countryCode=${countryCode}`) // Make sure you pass the correct countryCode
+          .then((response) => response.json())
+          .then((states) => {
+            if (states.success) {
+              states.data.forEach((state) => {
+                const option = document.createElement("option");
+                option.value = state._id;
+                option.textContent = state.name;
+                stateSelect.appendChild(option);
+              });
+              stateSelect.disabled = false; // Enable state dropdown
+            } else {
+              console.error("Failed to fetch states:", states.msg);
+            }
+          })
+          .catch((err) => console.error("Error fetching states:", err));
+      }
+
+      // Event listener for state change
+      stateSelect.addEventListener("change", function () {
+        loadCities(); // Call the loadCities function on state change
+      });
+
+      // Function to load cities based on selected state
+      function loadCities() {
+        const stateCode = stateSelect.value; // Assuming the value is the stateCode
+        citySelect.innerHTML = '<option value="">Select City</option>';
+        citySelect.disabled = true;
+
+        if (stateCode) {
+          fetch(`/get-cities/${stateCode}`)
+            .then((response) => response.json())
+            .then((cities) => {
+              cities.data.forEach((city) => {
+                const option = document.createElement("option");
+                option.value = city._id;
+                option.textContent = city.name;
+                citySelect.appendChild(option);
+              });
+              citySelect.disabled = false; // Enable city dropdown
+            })
+            .catch((err) => console.error("Error fetching cities:", err));
+        }
+      }
+    </script>
   </body>
 </html>

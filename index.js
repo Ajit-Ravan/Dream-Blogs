@@ -9,6 +9,7 @@ const { checkForAuthenticationCookie } = require("./middlwares/authentication");
 const saveCountriesToDB = require('./services/countryData');
 const saveStatesToDB = require("./services/stateData");
 const saveCitiesToDB = require("./services/cityData");
+const dependencyRoute = require("./routes/user");
 
 const app = express();
 const PORT = 8000;
@@ -24,6 +25,9 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(checkForAuthenticationCookie("token"));      // we have passed token here because we set the token name as token while creating
 app.use(express.static(path.resolve("./public")));   //we are telling express that serve public folder statically 
+
+//api for fetch country,state,cities
+app.use('/', dependencyRoute);
 
 
 // Function to save data to the database

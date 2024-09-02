@@ -4,11 +4,18 @@ const router = Router();
 const Country = require("../models/country");
 const State = require("../models/state");
 const City = require("../models/city");
-
+const dependencyLocation = require("../controllers/dependencyLocation");
 
 router.get("/signin", (req, res) => {
     res.render("signin");
 });
+
+//get countries data 
+router.get('/get-countries', dependencyLocation.getCountries);
+//get states data
+router.get('/get-states', dependencyLocation.getStates);
+//get city data
+router.get('/get-cities/:stateCode', dependencyLocation.getCities);
 
 
 router.get("/signup", async (req, res) => {
