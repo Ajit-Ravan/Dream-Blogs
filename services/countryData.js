@@ -1,4 +1,5 @@
-const { Country } = require('country-state-city');
+const { Country, State, City } = require('country-state-city');
+
 const CountryModel = require('../models/country');
 
 

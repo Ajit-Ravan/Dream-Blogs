@@ -2,12 +2,18 @@
 <html lang="en">
   <head>
     <title>Signup Page</title>
+
     <%- include("./partials/head") %>
   </head>
   <body>
     <%- include('./partials/nav') %>
     <div class="container mt-4">
-      <form action="/user/signup" method="post">
+      <form
+        action="/user/signup"
+        method="post"
+        class="needs-validation"
+        novalidate
+      >
         <div class="mb-3">
           <label for="firstName" class="form-label">Full Name</label>
           <input
@@ -17,6 +23,7 @@
             name="firstName"
             required
           />
+          <div class="invalid-feedback">Please enter your full name.</div>
         </div>
 
         <div class="mb-3">
@@ -28,6 +35,9 @@
             name="email"
             required
           />
+          <div class="invalid-feedback">
+            Please enter a valid email address.
+          </div>
         </div>
 
         <div class="mb-3">
@@ -39,37 +49,59 @@
             name="password"
             required
           />
+          <div class="invalid-feedback">Please enter your password.</div>
         </div>
 
         <div class="mb-3">
-          <h2>Select Location</h2>
+          <h4>Select Location</h4>
 
           <!-- Country Dropdown -->
-          <label for="country">Country:</label>
-          <select id="country" name="country" onchange="loadStates()">
-            <option value="">Select Country</option>
-            <% countries.forEach(country => { %>
-            <option value="<%= country.short_name %>">
-              <%= country.name %>
-            </option>
-            <!-- Assuming country.short_name is the countryCode -->
-            <% }) %>
-          </select>
+          <div class="mb-2">
+            <label for="country" class="form-label">Country:</label>
+            <select
+              id="country"
+              name="country"
+              class="form-select"
+              onchange="loadStates()"
+              required
+            >
+              <option value="">Select Country</option>
+              <% countries.forEach(country => { %>
+              <option value="<%= country.short_name %>">
+                <%= country.name %>
+              </option>
+              <% }) %>
+            </select>
+            <div class="invalid-feedback">Please select a country.</div>
+          </div>
 
           <!-- State Dropdown -->
-          <label for="state" class="mt-2">State:</label>
-          <select id="state" name="state" onchange="loadCities()">
-            <option value="">Select State</option>
-            <% states.forEach(state => { %>
-            <option value="<%= state._id %>"><%= state.name %></option>
-            <% }) %>
-          </select>
+          <div class="mb-2">
+            <label for="state" class="form-label">State:</label>
+            <select
+              id="state"
+              name="state"
+              class="form-select"
+              onchange="loadCities()"
+              required
+              disabled
+            >
+              <option value="">Select State</option>
+              <% states.forEach(state => { %>
+              <option value="<%= state.isoCode %>"><%= state.name %></option>
+              <% }) %>
+            </select>
+            <div class="invalid-feedback">Please select a state.</div>
+          </div>
 
           <!-- City Dropdown -->
-          <label for="city" class="mt-2">City:</label>
-          <select id="city" name="city" class="form-select" required disabled>
-            <option value="">Select City</option>
-          </select>
+          <div class="mb-2">
+            <label for="city" class="form-label">City:</label>
+            <select id="city" name="city" class="form-select" required disabled>
+              <option value="">Select City</option>
+            </select>
+            <div class="invalid-feedback">Please select a city.</div>
+          </div>
         </div>
 
         <button type="submit" class="btn btn-primary mt-3">Submit</button>
@@ -90,69 +122,73 @@
         .then((data) => {
           data.data.forEach((country) => {
             const option = document.createElement("option");
-            option.value = country.short_name; // Assuming country.short_name is the countryCode
+            option.value = country.short_name; // Assuming short_name is the countryCode
             option.textContent = country.name;
             countrySelect.appendChild(option);
           });
         })
         .catch((err) => console.error("Error fetching countries:", err));
 
-      // Event listener for country change
-      countrySelect.addEventListener("change", function () {
-        loadStates(); // Call the loadStates function on country change
-      });
-
-      // Function to load states based on selected country
+      // Load states based on selected country
       function loadStates() {
-        const countryCode = countrySelect.value; // Assuming the value is the countryCode
+        const countryCode = countrySelect.value; // Get selected countryCode
         stateSelect.innerHTML = '<option value="">Select State</option>';
         citySelect.innerHTML = '<option value="">Select City</option>';
         stateSelect.disabled = true;
         citySelect.disabled = true;
 
-        console.log("Fetching states for country code:", countryCode);
         if (countryCode) {
+          fetch(`/get-states?countryCode=${countryCode}`)
+            .then((response) => response.json())
+            .then((states) => {
+              if (states.success) {
+                states.data.forEach((state) => {
+                  const option = document.createElement("option");
+                  option.value = state.isoCode; // Ensure this is correctly assigned
+                  option.textContent = state.name;
+                  stateSelect.appendChild(option);
+                });
+                stateSelect.disabled = false; // Enable state dropdown
+              } else {
+                console.error("Failed to fetch states:", states.msg);
+              }
+            })
+            .catch((err) => console.error("Error fetching states:", err));
         }
-        fetch(`/get-states?countryCode=${countryCode}`) // Make sure you pass the correct countryCode
-          .then((response) => response.json())
-          .then((states) => {
-            if (states.success) {
-              states.data.forEach((state) => {
-                const option = document.createElement("option");
-                option.value = state._id;
-                option.textContent = state.name;
-                stateSelect.appendChild(option);
-              });
-              stateSelect.disabled = false; // Enable state dropdown
-            } else {
-              console.error("Failed to fetch states:", states.msg);
-            }
-          })
-          .catch((err) => console.error("Error fetching states:", err));
       }
 
-      // Event listener for state change
-      stateSelect.addEventListener("change", function () {
-        loadCities(); // Call the loadCities function on state change
-      });
-
-      // Function to load cities based on selected state
+      // Load cities based on selected state
       function loadCities() {
-        const stateCode = stateSelect.value; // Assuming the value is the stateCode
+        const isoCode = stateSelect.value; // Get selected state's isoCode
+        const countryCode = countrySelect.value; // Get selected country's countryCode
+
+        console.log("Selected state isoCode:", isoCode); // Log the selected isoCode
+        console.log("Selected countryCode:", countryCode); // Log the selected countryCode
+
         citySelect.innerHTML = '<option value="">Select City</option>';
         citySelect.disabled = true;
 
-        if (stateCode) {
-          fetch(`/get-cities/${stateCode}`)
+        if (isoCode && countryCode) {
+          console.log(
+            "Fetching cities for isoCode:",
+            isoCode,
+            "and countryCode:",
+            countryCode
+          );
+          fetch(`/get-cities?isoCode=${isoCode}&countryCode=${countryCode}`) // Pass both isoCode and countryCode as query parameters
             .then((response) => response.json())
-            .then((cities) => {
-              cities.data.forEach((city) => {
-                const option = document.createElement("option");
-                option.value = city._id;
-                option.textContent = city.name;
-                citySelect.appendChild(option);
-              });
-              citySelect.disabled = false; // Enable city dropdown
+            .then((data) => {
+              if (data.success) {
+                data.data.forEach((city) => {
+                  const option = document.createElement("option");
+                  option.value = city._id;
+                  option.textContent = city.name;
+                  citySelect.appendChild(option);
+                });
+                citySelect.disabled = false; // Enable city dropdown
+              } else {
+                console.error("Failed to fetch cities:", data.msg);
+              }
             })
             .catch((err) => console.error("Error fetching cities:", err));
         }

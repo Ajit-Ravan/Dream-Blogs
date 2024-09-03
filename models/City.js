@@ -2,15 +2,9 @@ const mongoose = require('mongoose');
 
 
 const citySchema = mongoose.Schema({
-    name: {
-        type: String,
-        required: true,
-    },
-    stateId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'State',
-        required: true,
-    },
+    name: { type: String, required: true },
+    countryCode: { type: String, required: true },
+    stateCode: { type: String, required: true }
 })
 
 

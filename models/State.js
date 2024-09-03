@@ -2,15 +2,9 @@ const mongoose = require('mongoose');
 
 
 const stateSchema = mongoose.Schema({
-    name: {
-        type: String,
-        required: true,
-    },
-    countryId: {
-        type: mongoose.SchemaTypes.ObjectId,
-        ref: 'Country',
-        required: true,
-    },
+    name: { type: String, required: true },
+    countryCode: { type: String, required: true },
+    isoCode: { type: String, required: true },
 })
 
 

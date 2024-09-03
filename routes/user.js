@@ -15,8 +15,7 @@ router.get('/get-countries', dependencyLocation.getCountries);
 //get states data
 router.get('/get-states', dependencyLocation.getStates);
 //get city data
-router.get('/get-cities/:stateCode', dependencyLocation.getCities);
-
+router.get('/get-cities', dependencyLocation.getCities);
 
 router.get("/signup", async (req, res) => {
     try {

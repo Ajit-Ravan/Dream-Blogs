@@ -1,4 +1,5 @@
-const { State } = require('country-state-city');
+const { Country, State, City } = require('country-state-city');
+
 const StateModel = require('../models/state');
 
 const saveStatesToDB = async () => {
@@ -12,6 +13,7 @@ const saveStatesToDB = async () => {
     const stateDoc = states.map(state => ({
         name: state.name,
         countryCode: state.countryCode,
+        isoCode: state.isoCode,
     }));
 
     await StateModel.insertMany(stateDoc);
